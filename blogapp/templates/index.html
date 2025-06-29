@@ -1,0 +1,24 @@
+{% extends "blog.html" %}
+ 
+{% block title %}
+{% comment %} Shivu Blogs {% endcomment %}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold text-center mb-10 text-emerald-800">Latest Blog Posts</h1>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for post in posts %}
+        <div class="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition-shadow duration-300">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ post.title }}</h2>
+            <p class="text-gray-600 line-clamp-3 mb-4">{{ post.content|truncatewords:20 }}</p>
+            <a href="{% url 'detail' post.slug %}" 
+               class="inline-block text-sm font-semibold text-emerald-700 hover:text-emerald-900 transition-colors duration-200">
+               Read More →
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

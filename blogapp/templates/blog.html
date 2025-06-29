@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}My Blog{% endblock %}</title>
+
+  <!-- Tailwind CDN (for production use CDN or your build setup) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Optional: Add custom Tailwind config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#047857', // emerald-700
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <!-- Navigation Bar -->
+  <nav class="bg-primary text-white py-6 px-8 shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold hover:text-gray-200 transition">📝 Blogged</a>
+      <a href="/contact" class="text-sm uppercase hover:text-gray-200 transition">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-10">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- Footer (optional) -->
+  <footer class="bg-gray-100 py-6 mt-10 text-center text-sm text-gray-500">
+    © {{ now|date:"Y" }} Blogged. All rights reserved.
+  </footer>
+</body>
+</html>
