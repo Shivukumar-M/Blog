@@ -2,8 +2,16 @@ from django.contrib import admin
 from django.urls import path
 from blogapp import views
 
+from django.urls import path
+from . import views
+
 urlpatterns = [
-    # path('helo/',views.helo, name='helo')
-    path('<slug:slug>/', views.detail, name='detail' ),
-    path('',views.index, name='index')
+    path('', views.index, name='index'),
+    path('search/', views.search, name='search'),
+    path('archive/', views.archive, name='archive'),
+    path('contact/', views.contact, name='contact'),
+    path('newsletter/', views.newsletter_signup, name='newsletter_signup'),
+    path('category/<slug:slug>/', views.category_posts, name='category_posts'),
+    path('tag/<slug:slug>/', views.tag_posts, name='tag_posts'),
+    path('<slug:slug>/', views.detail, name='detail'),
 ]

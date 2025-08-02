@@ -1,0 +1,58 @@
+{% extends "blog.html" %}
+
+{% block title %}{{ category.name }} | AnimeVerse{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-4 gradient-text">{{ category.name }}</h1>
+        <p class="text-gray-400 text-lg">{{ category.description|default:"Explore our collection of anime content" }}</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for post in posts %}
+        <article class="anime-card rounded-2xl overflow-hidden group">
+            {% if post.featured_image %}
+            <div class="relative h-48 overflow-hidden">
+                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" 
+                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                {% if post.rating %}
+                <div class="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full font-bold text-sm">
+                    {{ post.rating }}/10
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
+                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                </h3>
+                <p class="text-gray-300 mb-4">{{ post.excerpt|truncatewords:15 }}</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-400">{{ post.created_at|date:"M d, Y" }}</span>
+                    <a href="{{ post.get_absolute_url }}" class="text-primary hover:text-secondary font-semibold text-sm">
+                        Read More →
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-12">
+        <nav class="flex space-x-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-primary/20">Previous</a>
+            {% endif %}
+            <span class="px-4 py-2 bg-primary text-white rounded-lg">{{ page_obj.number }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-primary/20">Next</a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

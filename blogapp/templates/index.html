@@ -1,24 +1,246 @@
 {% extends "blog.html" %}
- 
-{% block title %}
-{% comment %} Shivu Blogs {% endcomment %}
-{% endblock %}
+
+{% block title %}AnimeVerse - Your Ultimate Anime Blog{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold text-center mb-10 text-emerald-800">Latest Blog Posts</h1>
+<!-- Hero Section -->
+<section class="relative overflow-hidden py-20 bg-gradient-to-r from-purple-900/50 to-blue-900/50">
+    <div class="absolute inset-0 bg-black/20"></div>
+    <div class="relative max-w-7xl mx-auto px-4 text-center">
+        <div class="animate-float">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 gradient-text">
+                Welcome to AnimeVerse
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                Discover amazing anime reviews, news, and recommendations from passionate otaku writers
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#featured" class="bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+                    Explore Reviews
+                </a>
+                <a href="/archive/" class="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300">
+                    Browse Archive
+                </a>
+            </div>
+        </div>
+    </div>
     
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for post in posts %}
-        <div class="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition-shadow duration-300">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ post.title }}</h2>
-            <p class="text-gray-600 line-clamp-3 mb-4">{{ post.content|truncatewords:20 }}</p>
-            <a href="{% url 'detail' post.slug %}" 
-               class="inline-block text-sm font-semibold text-emerald-700 hover:text-emerald-900 transition-colors duration-200">
-               Read More →
+    <!-- Floating anime elements -->
+    <div class="absolute top-20 left-10 animate-float" style="animation-delay: -2s;">
+        <div class="w-16 h-16 bg-anime-pink/20 rounded-full flex items-center justify-center">
+            <i class="fas fa-star text-anime-pink text-2xl"></i>
+        </div>
+    </div>
+    <div class="absolute top-32 right-20 animate-float" style="animation-delay: -4s;">
+        <div class="w-12 h-12 bg-anime-blue/20 rounded-full flex items-center justify-center">
+            <i class="fas fa-heart text-anime-blue text-lg"></i>
+        </div>
+    </div>
+    <div class="absolute bottom-20 left-1/4 animate-float" style="animation-delay: -1s;">
+        <div class="w-14 h-14 bg-anime-purple/20 rounded-full flex items-center justify-center">
+            <i class="fas fa-bolt text-anime-purple text-xl"></i>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Posts Section -->
+<section id="featured" class="py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4 gradient-text">Featured Reviews</h2>
+            <p class="text-gray-400 text-lg">Handpicked anime reviews with ratings above 8.0</p>
+        </div>
+        
+        {% if featured_posts %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for post in featured_posts %}
+            <article class="anime-card rounded-2xl overflow-hidden group">
+                {% if post.featured_image %}
+                <div class="relative h-48 overflow-hidden">
+                    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" 
+                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    
+                    <!-- Rating Badge -->
+                    {% if post.rating %}
+                    <div class="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full font-bold text-sm">
+                        <i class="fas fa-star mr-1"></i>{{ post.rating }}/10
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Anime Type Badge -->
+                    {% if post.anime_type %}
+                    <div class="absolute top-4 left-4 bg-primary/80 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs uppercase font-semibold">
+                        {{ post.get_anime_type_display }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        {% if post.category %}
+                        <span class="text-xs font-semibold text-secondary uppercase tracking-wide">
+                            {{ post.category.name }}
+                        </span>
+                        {% endif %}
+                        <span class="text-xs text-gray-400">
+                            <i class="fas fa-eye mr-1"></i>{{ post.views }}
+                        </span>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
+                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                    </h3>
+                    
+                    {% if post.anime_title_jp %}
+                    <p class="text-sm text-gray-400 mb-2 font-japanese">{{ post.anime_title_jp }}</p>
+                    {% endif %}
+                    
+                    <p class="text-gray-300 mb-4 leading-relaxed">{{ post.excerpt|truncatewords:15 }}</p>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4 text-sm text-gray-400">
+                            {% if post.studio %}
+                            <span><i class="fas fa-building mr-1"></i>{{ post.studio }}</span>
+                            {% endif %}
+                            {% if post.release_year %}
+                            <span><i class="fas fa-calendar mr-1"></i>{{ post.release_year }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ post.get_absolute_url }}" 
+                           class="text-primary hover:text-secondary font-semibold text-sm transition-colors duration-300">
+                            Read More <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-search text-6xl text-gray-600 mb-4"></i>
+            <p class="text-gray-400 text-lg">No featured posts available yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Recent Posts Section -->
+<section class="py-16 bg-white/5 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4 gradient-text">Latest Reviews</h2>
+            <p class="text-gray-400 text-lg">Fresh anime content straight from our writers</p>
+        </div>
+        
+        {% if recent_posts %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for post in recent_posts %}
+            <article class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:bg-white/20 hover:border-primary/50 transition-all duration-300 group">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        {% if post.category %}
+                        <span class="inline-block bg-gradient-to-r from-primary/20 to-secondary/20 text-primary px-3 py-1 rounded-full text-xs font-semibold mb-2">
+                            {{ post.category.name }}
+                        </span>
+                        {% endif %}
+                        <h3 class="text-lg font-semibold mb-2 group-hover:text-primary transition-colors duration-300">
+                            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                        </h3>
+                        {% if post.anime_title_jp %}
+                        <p class="text-sm text-gray-400 font-japanese mb-2">{{ post.anime_title_jp }}</p>
+                        {% endif %}
+                    </div>
+                    {% if post.rating %}
+                    <div class="flex items-center bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
+                        <i class="fas fa-star mr-1"></i>{{ post.rating }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <p class="text-gray-300 text-sm mb-4 leading-relaxed">{{ post.excerpt|truncatewords:12 }}</p>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 text-xs text-gray-400">
+                        <span><i class="fas fa-calendar mr-1"></i>{{ post.created_at|date:"M d" }}</span>
+                        <span><i class="fas fa-eye mr-1"></i>{{ post.views }}</span>
+                        <span><i class="fas fa-comments mr-1"></i>{{ post.comments.count }}</span>
+                    </div>
+                    <a href="{{ post.get_absolute_url }}" 
+                       class="text-primary hover:text-secondary font-semibold text-sm transition-colors duration-300">
+                        Read <i class="fas fa-chevron-right ml-1"></i>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="/archive/" 
+               class="inline-block bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+                View All Posts <i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-pen-nib text-6xl text-gray-600 mb-4"></i>
+            <p class="text-gray-400 text-lg">No recent posts available yet.</p>
+        </div>
+        {% endif %}
     </div>
-</div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4 gradient-text">Explore Categories</h2>
+            <p class="text-gray-400 text-lg">Find anime content by your favorite genres and types</p>
+        </div>
+        
+        {% if popular_categories %}
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {% for category in popular_categories %}
+            <a href="/category/{{ category.slug }}/" 
+               class="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-xl p-6 text-center border border-white/10 hover:border-primary/50 hover:from-primary/20 hover:to-secondary/10 transition-all duration-300 transform hover:scale-105">
+                <div class="w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center" 
+                     style="background: linear-gradient(135deg, {{ category.color }}40, {{ category.color }}20);">
+                    <i class="fas fa-tags text-xl" style="color: {{ category.color }};"></i>
+                </div>
+                <h3 class="font-semibold text-sm mb-1 group-hover:text-primary transition-colors duration-300">
+                    {{ category.name }}
+                </h3>
+                <p class="text-xs text-gray-400">{{ category.post_count }} post{{ category.post_count|pluralize }}</p>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-16 bg-gradient-to-r from-primary/10 to-secondary/10 backdrop-blur-sm">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-12 gradient-text">Join Our Growing Community</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div class="group">
+                <div class="text-4xl font-bold text-primary mb-2 group-hover:animate-pulse">1000+</div>
+                <div class="text-sm text-gray-400 uppercase tracking-wide">Anime Reviewed</div>
+            </div>
+            <div class="group">
+                <div class="text-4xl font-bold text-secondary mb-2 group-hover:animate-pulse">5000+</div>
+                <div class="text-sm text-gray-400 uppercase tracking-wide">Community Members</div>
+            </div>
+            <div class="group">
+                <div class="text-4xl font-bold text-anime-pink mb-2 group-hover:animate-pulse">250+</div>
+                <div class="text-sm text-gray-400 uppercase tracking-wide">Weekly Readers</div>
+            </div>
+            <div class="group">
+                <div class="text-4xl font-bold text-accent mb-2 group-hover:animate-pulse">50+</div>
+                <div class="text-sm text-gray-400 uppercase tracking-wide">Studios Covered</div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

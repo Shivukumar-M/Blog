@@ -1,0 +1,44 @@
+{% extends "blog.html" %}
+
+{% block title %}Search Results | AnimeVerse{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-4 gradient-text">Search Results</h1>
+        {% if query %}
+        <p class="text-gray-400 text-lg">Results for: <span class="text-primary">"{{ query }}"</span></p>
+        {% endif %}
+    </div>
+    
+    {% if posts %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for post in posts %}
+        <article class="anime-card rounded-2xl overflow-hidden group">
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
+                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                </h3>
+                {% if post.anime_title_jp %}
+                <p class="text-sm text-gray-400 mb-2">{{ post.anime_title_jp }}</p>
+                {% endif %}
+                <p class="text-gray-300 mb-4">{{ post.excerpt|truncatewords:15 }}</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-400">{{ post.created_at|date:"M d, Y" }}</span>
+                    <a href="{{ post.get_absolute_url }}" class="text-primary hover:text-secondary font-semibold text-sm">
+                        Read More →
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <i class="fas fa-search text-6xl text-gray-600 mb-4"></i>
+        <p class="text-gray-400 text-lg">No results found.</p>
+        <p class="text-gray-500">Try searching with different keywords.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

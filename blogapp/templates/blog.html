@@ -1,45 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" /> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}My Blog{% endblock %}</title>
-
-  <!-- Tailwind CDN (for production use CDN or your build setup) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Optional: Add custom Tailwind config -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#047857', // emerald-700
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AnimeVerse - Your Ultimate Anime Blog{% endblock %}</title>
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Discover the latest anime reviews, news, and insights on AnimeVerse. Your ultimate destination for anime content.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}anime, manga, reviews, news, otaku, japanese animation{% endblock %}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8B5CF6',
+                        secondary: '#06B6D4',
+                        accent: '#F59E0B',
+                        dark: '#1F2937',
+                        'anime-pink': '#FF6B9D',
+                        'anime-purple': '#C084FC',
+                        'anime-blue': '#60A5FA',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'japanese': ['Noto Sans JP', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                    }
+                }
+            }
         }
-      }
-    }
-  </script>
+    </script>
+    
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 20px #8B5CF6; }
+            to { box-shadow: 0 0 30px #8B5CF6, 0 0 40px #8B5CF6; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .anime-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.1));
+        }
+        .anime-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+        }
+    </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800 font-sans">
-  <!-- Navigation Bar -->
-  <nav class="bg-primary text-white py-6 px-8 shadow-md">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
-      <a href="/" class="text-2xl font-bold hover:text-gray-200 transition">📝 Blogged</a>
-      <a href="/contact" class="text-sm uppercase hover:text-gray-200 transition">Contact</a>
-    </div>
-  </nav>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white font-sans">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center space-x-2 group">
+                        <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center group-hover:animate-glow">
+                            <i class="fas fa-play text-white text-lg"></i>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">AnimeVerse</span>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="/" class="hover:text-primary transition-colors duration-300">Home</a>
+                        <a href="/archive/" class="hover:text-primary transition-colors duration-300">Archive</a>
+                        <a href="/contact/" class="hover:text-primary transition-colors duration-300">Contact</a>
+                    </div>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="hidden md:block">
+                    <form action="/search/" method="GET" class="relative">
+                        <input type="text" name="q" placeholder="Search anime..." 
+                               class="bg-white/10 border border-white/20 rounded-full py-2 pl-10 pr-4 w-64 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white/20 transition-all duration-300">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </form>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white hover:text-primary transition-colors duration-300">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black/50 backdrop-blur-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/" class="block px-3 py-2 hover:text-primary transition-colors duration-300">Home</a>
+                <a href="/archive/" class="block px-3 py-2 hover:text-primary transition-colors duration-300">Archive</a>
+                <a href="/contact/" class="block px-3 py-2 hover:text-primary transition-colors duration-300">Contact</a>
+                <div class="px-3 py-2">
+                    <form action="/search/" method="GET">
+                        <input type="text" name="q" placeholder="Search anime..." 
+                               class="w-full bg-white/10 border border-white/20 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 py-10">
-    {% block content %}
-    {% endblock %}
-  </main>
+    <!-- Main Content -->
+    <main class="pt-16">
+        {% if messages %}
+            <div class="fixed top-20 right-4 z-50 space-y-2">
+                {% for message in messages %}
+                    <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-slide-up">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    </main>
 
-  <!-- Footer (optional) -->
-  <footer class="bg-gray-100 py-6 mt-10 text-center text-sm text-gray-500">
-    © {{ now|date:"Y" }} Blogged. All rights reserved.
-  </footer>
+    <!-- Newsletter Section -->
+    <section class="py-16 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4 gradient-text">Stay Updated with Latest Anime</h2>
+            <p class="text-gray-300 mb-8">Get the latest anime reviews, news, and recommendations delivered to your inbox!</p>
+            
+            <form action="/newsletter/" method="POST" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Enter your email..." required
+                       class="flex-1 py-3 px-4 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white/20 transition-all duration-300">
+                <button type="submit" class="bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
+                    Subscribe
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black/50 backdrop-blur-lg py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Brand -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-play text-white text-lg"></i>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">AnimeVerse</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Your ultimate destination for anime reviews, news, and insights. Join our community of anime enthusiasts!</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="font-semibold mb-4 text-primary">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-400 hover:text-white transition-colors duration-300">Home</a></li>
+                        <li><a href="/archive/" class="text-gray-400 hover:text-white transition-colors duration-300">All Posts</a></li>
+                        <li><a href="/contact/" class="text-gray-400 hover:text-white transition-colors duration-300">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Categories -->
+                <div>
+                    <h3 class="font-semibold mb-4 text-secondary">Categories</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Reviews</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">News</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Recommendations</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="border-gray-700 my-8">
+            
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">© {{ now|date:"Y" }} AnimeVerse. All rights reserved.</p>
+                <p class="text-gray-400 text-sm mt-2 md:mt-0">Made with ❤️ for anime lovers worldwide</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Auto-hide messages
+        setTimeout(() => {
+            const messages = document.querySelectorAll('.animate-slide-up');
+            messages.forEach(msg => {
+                msg.style.opacity = '0';
+                msg.style.transform = 'translateX(100%)';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 5000);
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
