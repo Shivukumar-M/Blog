@@ -1,0 +1,356 @@
+{% extends "blog.html" %}
+
+{% block title %}Create New Post | AnimeVerse{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Page Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-4 gradient-text">
+            <i class="fas fa-pen-nib mr-3"></i>Create New Post
+        </h1>
+        <p class="text-gray-400 text-lg">Share your anime review with the community</p>
+    </div>
+
+    <!-- Create Post Form -->
+    <div class="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+        <form method="post" enctype="multipart/form-data" class="space-y-8">
+            {% csrf_token %}
+            
+            <!-- Basic Information Section -->
+            <div class="space-y-6">
+                <h2 class="text-2xl font-semibold text-primary border-b border-primary/30 pb-2">
+                    <i class="fas fa-info-circle mr-2"></i>Basic Information
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Title -->
+                    <div class="lg:col-span-2">
+                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-heading mr-2 text-primary"></i>Post Title *
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Category -->
+                    <div>
+                        <label for="{{ form.category.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-folder mr-2 text-secondary"></i>Category
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="text-red-400 text-sm mt-1 font-extrabold bg-black">{{ form.category.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Tags -->
+                    <div>
+                        <label for="{{ form.tags.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-tags mr-2 text-accent"></i>Tags
+                        </label>
+                        {{ form.tags }}
+                        <p class="text-xs text-gray-400 mt-1">Hold Ctrl/Cmd to select multiple tags</p>
+                        {% if form.tags.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.tags.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Excerpt -->
+                <div>
+                    <label for="{{ form.excerpt.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                        <i class="fas fa-quote-left mr-2 text-anime-pink"></i>Excerpt *
+                    </label>
+                    {{ form.excerpt }}
+                    <p class="text-xs text-gray-400 mt-1">Brief description for preview (max 300 characters)</p>
+                    {% if form.excerpt.errors %}
+                        <div class="text-red-400 text-sm mt-1">{{ form.excerpt.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Anime Details Section -->
+            <div class="space-y-6">
+                <h2 class="text-2xl font-semibold text-secondary border-b border-secondary/30 pb-2">
+                    <i class="fas fa-tv mr-2"></i>Anime Details
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Japanese Title -->
+                    <div>
+                        <label for="{{ form.anime_title_jp.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-language mr-2 text-anime-blue"></i>Japanese Title
+                        </label>
+                        {{ form.anime_title_jp }}
+                        {% if form.anime_title_jp.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.anime_title_jp.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Anime Type -->
+                    <div>
+                        <label for="{{ form.anime_type.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-film mr-2 text-anime-purple"></i>Anime Type
+                        </label>
+                        {{ form.anime_type }}
+                        {% if form.anime_type.errors %}
+                            <div class="text-red-800 text-sm mt-1 bg-purple-400">{{ form.anime_type.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Rating -->
+                    <div>
+                        <label for="{{ form.rating.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-star mr-2 text-yellow-400"></i>Rating (out of 10)
+                        </label>
+                        {{ form.rating }}
+                        {% if form.rating.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.rating.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Episode Count -->
+                    <div>
+                        <label for="{{ form.episode_count.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-list-ol mr-2 text-green-400"></i>Episode Count
+                        </label>
+                        {{ form.episode_count }}
+                        {% if form.episode_count.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.episode_count.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Release Year -->
+                    <div>
+                        <label for="{{ form.release_year.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-calendar mr-2 text-blue-400"></i>Release Year
+                        </label>
+                        {{ form.release_year }}
+                        {% if form.release_year.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.release_year.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Studio -->
+                    <div>
+                        <label for="{{ form.studio.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-building mr-2 text-purple-400"></i>Studio
+                        </label>
+                        {{ form.studio }}
+                        {% if form.studio.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.studio.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Section -->
+            <div class="space-y-6">
+                <h2 class="text-2xl font-semibold text-accent border-b border-accent/30 pb-2">
+                    <i class="fas fa-images mr-2"></i>Media
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Featured Image -->
+                    <div>
+                        <label for="{{ form.featured_image.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-image mr-2 text-primary"></i>Featured Image
+                        </label>
+                        <div class="relative">
+                            {{ form.featured_image }}
+                            <div class="mt-2 p-4 bg-white/5 rounded-lg border border-white/10">
+                                <p class="text-xs text-gray-400">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Upload a high-quality image (1200x600px recommended)
+                                </p>
+                            </div>
+                        </div>
+                        {% if form.featured_image.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.featured_image.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Thumbnail -->
+                    <div>
+                        <label for="{{ form.thumbnail.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-compress mr-2 text-secondary"></i>Thumbnail
+                        </label>
+                        <div class="relative">
+                            {{ form.thumbnail }}
+                            <div class="mt-2 p-4 bg-white/5 rounded-lg border border-white/10">
+                                <p class="text-xs text-gray-400">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Small preview image (400x300px recommended)
+                                </p>
+                            </div>
+                        </div>
+                        {% if form.thumbnail.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.thumbnail.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Section -->
+            <div class="space-y-6">
+                <h2 class="text-2xl font-semibold text-anime-pink border-b border-anime-pink/30 pb-2">
+                    <i class="fas fa-edit mr-2"></i>Content
+                </h2>
+                
+                <div>
+                    <label for="{{ form.content.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                        <i class="fas fa-paragraph mr-2 text-primary"></i>Post Content *
+                    </label>
+                    {{ form.content }}
+                    <div class="mt-2 p-4 bg-white/5 rounded-lg border border-white/10">
+                        <p class="text-xs text-gray-400 mb-2">
+                            <i class="fas fa-lightbulb mr-1 text-yellow-400"></i>
+                            <strong>Writing Tips:</strong>
+                        </p>
+                        <ul class="text-xs text-gray-400 space-y-1 list-disc list-inside">
+                            <li>Include plot summary, character analysis, and your personal opinion</li>
+                            <li>Discuss animation quality, soundtrack, and voice acting</li>
+                            <li>Compare with similar anime if relevant</li>
+                            <li>Be honest about both strengths and weaknesses</li>
+                        </ul>
+                    </div>
+                    {% if form.content.errors %}
+                        <div class="text-red-400 text-sm mt-1">{{ form.content.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- SEO Section -->
+            <div class="space-y-6">
+                <h2 class="text-2xl font-semibold text-green-400 border-b border-green-400/30 pb-2">
+                    <i class="fas fa-search mr-2"></i>SEO (Optional)
+                </h2>
+                
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Meta Description -->
+                    <div>
+                        <label for="{{ form.meta_description.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-file-alt mr-2 text-blue-400"></i>Meta Description
+                        </label>
+                        {{ form.meta_description }}
+                        <p class="text-xs text-gray-400 mt-1">Brief description for search engines (max 160 characters)</p>
+                        {% if form.meta_description.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.meta_description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Meta Keywords -->
+                    <div>
+                        <label for="{{ form.meta_keywords.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-key mr-2 text-purple-400"></i>Meta Keywords
+                        </label>
+                        {{ form.meta_keywords }}
+                        <p class="text-xs text-gray-400 mt-1">Comma-separated keywords for SEO</p>
+                        {% if form.meta_keywords.errors %}
+                            <div class="text-red-400 text-sm mt-1">{{ form.meta_keywords.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-8 border-t border-white/10">
+                <button type="submit" name="status" value="published"
+                        class="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-paper-plane mr-2"></i>Publish Post
+                </button>
+                
+                <button type="submit" name="status" value="draft"
+                        class="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-primary/50 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300">
+                    <i class="fas fa-save mr-2"></i>Save as Draft
+                </button>
+                
+                <a href="{% url 'index' %}" 
+                   class="flex-1 text-center bg-gray-600 hover:bg-gray-700 text-white font-semibold py-4 px-8 rounded-lg transition-all duration-300">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Help Section -->
+    <div class="mt-12 bg-gradient-to-r from-blue-900/20 to-purple-900/20 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+        <h3 class="text-xl font-semibold mb-4 text-primary">
+            <i class="fas fa-question-circle mr-2"></i>Need Help?
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
+            <div>
+                <h4 class="font-semibold text-secondary mb-2">Writing Guidelines:</h4>
+                <ul class="space-y-1 list-disc list-inside text-gray-400">
+                    <li>Write at least 500 words for a comprehensive review</li>
+                    <li>Include both pros and cons</li>
+                    <li>Avoid major spoilers in the main content</li>
+                    <li>Be respectful and constructive in your criticism</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold text-accent mb-2">Image Guidelines:</h4>
+                <ul class="space-y-1 list-disc list-inside text-gray-400">
+                    <li>Use official artwork or high-quality screenshots</li>
+                    <li>Ensure images are relevant to your review</li>
+                    <li>Optimal size: 1200x600px for featured image</li>
+                    <li>Supported formats: JPG, PNG, WebP</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-generate slug from title
+document.addEventListener('DOMContentLoaded', function() {
+    const titleField = document.getElementById('{{ form.title.id_for_label }}');
+    
+    if (titleField) {
+        titleField.addEventListener('input', function() {
+            // You can add slug generation logic here if needed
+            // For now, Django will handle slug generation in the backend
+        });
+    }
+    
+    // Character count for excerpt
+    const excerptField = document.getElementById('{{ form.excerpt.id_for_label }}');
+    if (excerptField) {
+        const maxLength = 300;
+        const counterDiv = document.createElement('div');
+        counterDiv.className = 'text-xs text-gray-400 mt-1 text-right';
+        excerptField.parentNode.appendChild(counterDiv);
+        
+        function updateCounter() {
+            const remaining = maxLength - excerptField.value.length;
+            counterDiv.textContent = `${excerptField.value.length}/${maxLength} characters`;
+            counterDiv.className = remaining < 0 ? 'text-xs text-red-400 mt-1 text-right' : 'text-xs text-gray-400 mt-1 text-right';
+        }
+        
+        excerptField.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+    
+    // Character count for meta description
+    const metaDescField = document.getElementById('{{ form.meta_description.id_for_label }}');
+    if (metaDescField) {
+        const maxLength = 160;
+        const counterDiv = document.createElement('div');
+        counterDiv.className = 'text-xs text-gray-400 mt-1 text-right';
+        metaDescField.parentNode.appendChild(counterDiv);
+        
+        function updateMetaCounter() {
+            const remaining = maxLength - metaDescField.value.length;
+            counterDiv.textContent = `${metaDescField.value.length}/${maxLength} characters`;
+            counterDiv.className = remaining < 0 ? 'text-xs text-red-400 mt-1 text-right' : 'text-xs text-gray-400 mt-1 text-right';
+        }
+        
+        metaDescField.addEventListener('input', updateMetaCounter);
+        updateMetaCounter();
+    }
+});
+</script>
+{% endblock %}

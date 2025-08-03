@@ -13,5 +13,6 @@ urlpatterns = [
     path('newsletter/', views.newsletter_signup, name='newsletter_signup'),
     path('category/<slug:slug>/', views.category_posts, name='category_posts'),
     path('tag/<slug:slug>/', views.tag_posts, name='tag_posts'),
+    path('create_post/', views.create_post, name='create_post'),
     path('<slug:slug>/', views.detail, name='detail'),
 ]

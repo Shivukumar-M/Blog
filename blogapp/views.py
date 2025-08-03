@@ -3,8 +3,10 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.contrib import messages
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.utils.text import slugify
 from .models import Post, Category, Tag, Comment, Newsletter, Contact
-from .forms import CommentForm, NewsletterForm, ContactForm
+from .forms import CommentForm, NewsletterForm, ContactForm, PostForm
 
 def index(request):
     # Get featured posts (high rating or most viewed)
@@ -27,6 +29,49 @@ def index(request):
         'popular_categories': popular_categories,
     }
     return render(request, 'index.html', context)
+
+@login_required
+def create_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            
+            # Generate slug from title
+            post.slug = slugify(post.title)
+            
+            # Make slug unique if it already exists
+            original_slug = post.slug
+            counter = 1
+            while Post.objects.filter(slug=post.slug).exists():
+                post.slug = f"{original_slug}-{counter}"
+                counter += 1
+            
+            # Handle status from form submission
+            if 'status' in request.POST:
+                post.status = request.POST['status']
+            else:
+                post.status = 'published'
+            
+            post.save()
+            form.save_m2m()  # Save many-to-many relationships (tags)
+            
+            if post.status == 'published':
+                messages.success(request, f'Your post "{post.title}" has been published successfully!')
+                return redirect('detail', slug=post.slug)
+            else:
+                messages.success(request, f'Your post "{post.title}" has been saved as draft!')
+                return redirect('create_post')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = PostForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'create_post.html', context)
 
 def detail(request, slug):
     post = get_object_or_404(Post, slug=slug, status='published')
