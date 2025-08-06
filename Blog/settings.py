@@ -123,10 +123,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# Login
+LOGIN_REDIRECT_URL = '/'
 
 
 # new additions 
-# settings.py additions for your anime blog
+#  additions for your anime blog
 
 import os
 from pathlib import Path
@@ -142,14 +144,14 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# Email configuration (for contact forms and newsletters)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Update with your email provider
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@gmail.com'  # Your email
-EMAIL_HOST_PASSWORD = 'your-app-password'  # Your app password
-DEFAULT_FROM_EMAIL = 'AnimeVerse <noreply@animeverse.com>'
+# # Email configuration (for contact forms and newsletters)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'  # Update with your email provider
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@gmail.com'  # Your email
+# EMAIL_HOST_PASSWORD = 'your-app-password'  # Your app password
+# DEFAULT_FROM_EMAIL = 'AnimeVerse <noreply@animeverse.com>'
 
 # Pagination settings
 POSTS_PER_PAGE = 9

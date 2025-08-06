@@ -9,25 +9,30 @@
         <p class="text-gray-400 text-lg">Have questions or suggestions? We'd love to hear from you!</p>
     </div>
     
-    <div class="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-        <form method="post" class="space-y-6">
+    <div class=" bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+        <form method="post" class="space-y-6 text-black ">
             {% csrf_token %}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    {{ form.name.label_tag }}
-                    {{ form.name }}
+                    <span class="text-white">
+                        {{ form.name.label_tag }}
+                    </span>
+                    {{ form.name   }}
                 </div>
                 <div>
-                    {{ form.email.label_tag }}
+                    <span class="text-white">
+                    {{ form.email.label_tag }}  </span>
                     {{ form.email }}
                 </div>
             </div>
             <div>
-                {{ form.subject.label_tag }}
+                <span class="text-white">
+                {{ form.subject.label_tag }}  </span>
                 {{ form.subject }}
             </div>
             <div>
-                {{ form.message.label_tag }}
+                <span class="text-white">
+                {{ form.message.label_tag }}  </span>
                 {{ form.message }}
             </div>
             <button type="submit" class="bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105">

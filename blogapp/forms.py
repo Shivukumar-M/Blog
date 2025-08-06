@@ -1,21 +1,32 @@
 from django import forms
 from .models import Comment, Newsletter, Contact, Post, Category, Tag
 
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+
+class SignUpForm(UserCreationForm):
+
+     class Meta:
+        model = User
+        fields =['username','password1', 'password2',]
+
+
+
 class PostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
         
         # Common styling for text inputs
-        text_input_classes = 'w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white placeholder-gray-400'
+        text_input_classes = ' w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white placeholder-gray-400'
         
         # Common styling for select inputs
-        select_classes = 'w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white'
+        select_classes = 'text-black w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white'
         
         # Common styling for textarea
-        textarea_classes = 'w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white placeholder-gray-400 resize-vertical'
+        textarea_classes = ' w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white placeholder-gray-400 resize-vertical'
         
         # File input styling
-        file_classes = 'w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/80'
+        file_classes = ' w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/80'
         
         # Apply styling to fields
         self.fields['title'].widget.attrs.update({
@@ -133,15 +144,15 @@ class CommentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
         self.fields['name'].widget.attrs.update({
-            'class': 'w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200',
+            'class': 'text-black w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200',
             'placeholder': 'Your Name'
         })
         self.fields['email'].widget.attrs.update({
-            'class': 'w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200',
+            'class': 'text-black w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200',
             'placeholder': 'your.email@example.com'
         })
         self.fields['content'].widget.attrs.update({
-            'class': 'w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none',
+            'class': 'text-black w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none',
             'placeholder': 'Share your thoughts about this anime...',
             'rows': 4
         })
@@ -173,7 +184,7 @@ class ContactForm(forms.ModelForm):
         super(ContactForm, self).__init__(*args, **kwargs)
         
         # Common styling for all fields
-        common_classes = 'w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200'
+        common_classes = 'text-black w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200'
         
         self.fields['name'].widget.attrs.update({
             'class': common_classes,

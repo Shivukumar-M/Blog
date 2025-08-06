@@ -5,8 +5,9 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
+from django.contrib.auth import login , logout
 from .models import Post, Category, Tag, Comment, Newsletter, Contact
-from .forms import CommentForm, NewsletterForm, ContactForm, PostForm
+from .forms import CommentForm, NewsletterForm, ContactForm, PostForm,SignUpForm
 
 def index(request):
     # Get featured posts (high rating or most viewed)
@@ -223,3 +224,25 @@ def tag_posts(request, slug):
         'page_obj': page_obj,
     }
     return render(request, 'tag.html', context)
+
+
+#sign up
+def signup(req):
+    if req.method == 'POST':
+        form = SignUpForm(req.POST)
+
+        if form.is_valid():
+            user =form.save()
+
+            login(req, user)
+            return redirect('/')
+    else:
+        form = SignUpForm()
+
+    return render(req, 'signup.html',{'form':form})
+
+
+# logout
+def logout_view(request):
+    logout(request)
+    return redirect('/') 

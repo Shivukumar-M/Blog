@@ -1,0 +1,30 @@
+{% extends 'blog.html' %}
+
+{% block title %}
+  Logged Out - AnimeVerse
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center text-center bg-gradient-to-br from-primary/10 to-secondary/10 p-6">
+    <!-- Icon -->
+    <div class="bg-gradient-to-r from-primary to-secondary rounded-full w-20 h-20 flex items-center justify-center mb-6 shadow-xl">
+        <i class="fas fa-sign-out-alt text-white text-3xl"></i>
+    </div>
+
+    <!-- Message -->
+    <h1 class="text-4xl font-bold gradient-text mb-4">You’ve Logged Out</h1>
+    <p class="text-gray-300 text-lg mb-6">Thanks for spending time on AnimeVerse! Redirecting to home...</p>
+
+    <!-- Redirect Button -->
+    <a href="/" class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-xl shadow-lg hover:scale-105 transform transition">
+        Go to Home
+    </a>
+</div>
+
+<!-- Auto Redirect Script -->
+<script>
+    setTimeout(() => {
+        window.location.href = "/";
+    }, 3000); // Redirect after 3 seconds
+</script>
+{% endblock %}

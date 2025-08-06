@@ -46,6 +46,9 @@
     </script>
     
     <style>
+
+    {% comment %}  {% endcomment %}
+
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-20px); }
@@ -102,6 +105,7 @@
                         <a href="/archive/" class="hover:text-primary transition-colors duration-300">Archive</a>
                         <a href="/contact/" class="hover:text-primary transition-colors duration-300">Contact</a>
                     </div>
+                    
                 </div>
                 
                 <!-- Search Bar -->
@@ -111,6 +115,29 @@
                                class="bg-white/10 border border-white/20 rounded-full py-2 pl-10 pr-4 w-64 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white/20 transition-all duration-300">
                         <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                     </form>
+                </div>
+
+                <div>
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'logout' %}" class="inline-block">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                class="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-semibold px-5 py-3 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Log out
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="/login/" 
+                        class="flex items-center gap-2 text-white hover:text-primary font-semibold px-4 py-2 transition-colors duration-300">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                        <a href="/signup/" 
+                        class="flex items-center gap-2 text-white hover:text-primary font-semibold px-4 py-2 transition-colors duration-300">
+                            <i class="fas fa-user-plus"></i> Sign Up
+                        </a>
+                    {% endif %}
+
                 </div>
                 
                 <!-- Mobile menu button -->
@@ -155,7 +182,7 @@
     </main>
 
     <!-- Newsletter Section -->
-    <section class="py-16 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm">
+    <section id=news class="py-16 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl font-bold mb-4 gradient-text">Stay Updated with Latest Anime</h2>
             <p class="text-gray-300 mb-8">Get the latest anime reviews, news, and recommendations delivered to your inbox!</p>
@@ -215,7 +242,7 @@
                     <h3 class="font-semibold mb-4 text-secondary">Categories</h3>
                     <ul class="space-y-2">
                         <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Reviews</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">News</a></li>
+                        <li><a href="#news" class="text-gray-400 hover:text-white transition-colors duration-300">News</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Recommendations</a></li>
                     </ul>
                 </div>
@@ -229,37 +256,40 @@
             </div>
         </div>
     </footer>
-
-    <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+{% comment %} <script>
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    if (mobileMenuButton) {
+        mobileMenuButton.addEventListener('click', function() {
             const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
+            if (menu) menu.classList.toggle('hidden');
         });
+    }
 
-        // Auto-hide messages
-        setTimeout(() => {
-            const messages = document.querySelectorAll('.animate-slide-up');
-            messages.forEach(msg => {
-                msg.style.opacity = '0';
-                msg.style.transform = 'translateX(100%)';
-                setTimeout(() => msg.remove(), 300);
-            });
-        }, 5000);
-
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
+    // Auto-hide messages
+    setTimeout(() => {
+        const messages = document.querySelectorAll('.animate-slide-up');
+        messages.forEach(msg => {
+            msg.style.opacity = '0';
+            msg.style.transform = 'translateX(100%)';
+            setTimeout(() => msg.remove(), 300);
         });
-    </script>
+    }, 5000);
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script> {% endcomment %}
+
 </body>
 </html>
