@@ -13,29 +13,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = ['vercel.app', '127.0.0.1','localhost']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
 
-
-# Default: SQLite (for local development)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database configuration
+DATABASE_URL = config('DATABASE_URL', default=None)
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
-# If DATABASE_URL is set (e.g., in production), use it
-# DATABASE_URL = config('DATABASE_URL', default=None)
 
-# if DATABASE_URL:
-#     DATABASE_URL = DATABASE_URL.strip()  
-#     DATABASES['default'] = dj_database_url.parse(
-#         DATABASE_URL,
-#         conn_max_age=600,
-#         ssl_require=True
-#     )
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
