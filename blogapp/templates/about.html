@@ -1,0 +1,218 @@
+{% extends "blog.html" %}
+{% block title %}About Us - AnimeVerse{% endblock %}
+{% block meta_description %}Learn about AnimeVerse, your ultimate destination for anime reviews, news, and community. Discover our mission and what makes us special.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative py-20 px-4 overflow-hidden">
+    <!-- Floating Elements -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-20 left-10 w-20 h-20 bg-anime-pink/20 rounded-full blur-xl animate-float"></div>
+        <div class="absolute top-40 right-20 w-32 h-32 bg-anime-purple/20 rounded-full blur-2xl animate-float" style="animation-delay: -2s;"></div>
+        <div class="absolute bottom-20 left-1/3 w-24 h-24 bg-anime-blue/20 rounded-full blur-xl animate-float" style="animation-delay: -4s;"></div>
+    </div>
+    
+    <div class="max-w-4xl mx-auto text-center relative z-10">
+        <div class="mb-8 animate-slide-up">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-primary to-secondary rounded-2xl mb-6 animate-glow">
+                <i class="fas fa-heart text-3xl text-white"></i>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                <span class="gradient-text">About</span>
+                <span class="text-white">AnimeVerse</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                Welcome to <span class="gradient-text font-semibold">AnimeVerse</span> — a vibrant community crafted by anime fans, for anime fans across the globe.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Mission Section -->
+<section class="py-16 px-4">
+    <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6 animate-slide-up">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-r from-anime-pink to-anime-purple rounded-xl flex items-center justify-center">
+                        <i class="fas fa-rocket text-white text-xl"></i>
+                    </div>
+                    <h2 class="text-4xl font-bold gradient-text">Our Mission</h2>
+                </div>
+                <p class="text-lg text-gray-300 leading-relaxed">
+                    AnimeVerse exists to create the ultimate destination for anime enthusiasts. We're passionate about building 
+                    a space where fans can discover incredible content, share their love for anime, and connect with like-minded individuals.
+                </p>
+                <p class="text-lg text-gray-300 leading-relaxed">
+                    Whether you're obsessed with timeless classics like <span class="text-anime-blue font-medium">Naruto</span> and 
+                    <span class="text-anime-purple font-medium">One Piece</span>, or diving into modern masterpieces like 
+                    <span class="text-anime-pink font-medium">Jujutsu Kaisen</span> and <span class="text-secondary font-medium">Chainsaw Man</span>, 
+                    this is your home in the anime universe.
+                </p>
+            </div>
+            <div class="relative">
+                <div class="glass-effect rounded-2xl p-8 anime-card">
+                    <div class="text-center space-y-4">
+                        <div class="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl mx-auto flex items-center justify-center mb-4">
+                            <i class="fas fa-users text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Community First</h3>
+                        <p class="text-gray-300">Building connections through our shared love of anime culture and storytelling.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 px-4 bg-gradient-to-r from-primary/10 to-secondary/10">
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold gradient-text mb-4">What You'll Discover</h2>
+            <p class="text-xl text-gray-300">Everything you need to enhance your anime journey</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="glass-effect rounded-2xl p-6 anime-card text-center">
+                <div class="w-16 h-16 bg-gradient-to-r from-anime-pink to-anime-purple rounded-2xl mx-auto flex items-center justify-center mb-4">
+                    <i class="fas fa-newspaper text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Latest News</h3>
+                <p class="text-gray-300 text-sm">Stay updated with breaking anime news, announcements, and industry insights.</p>
+            </div>
+            
+            <div class="glass-effect rounded-2xl p-6 anime-card text-center">
+                <div class="w-16 h-16 bg-gradient-to-r from-anime-blue to-secondary rounded-2xl mx-auto flex items-center justify-center mb-4">
+                    <i class="fas fa-star text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Detailed Reviews</h3>
+                <p class="text-gray-300 text-sm">In-depth analysis of anime series, movies, and manga from passionate fans.</p>
+            </div>
+            
+            <div class="glass-effect rounded-2xl p-6 anime-card text-center">
+                <div class="w-16 h-16 bg-gradient-to-r from-primary to-anime-pink rounded-2xl mx-auto flex items-center justify-center mb-4">
+                    <i class="fas fa-lightbulb text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Smart Recommendations</h3>
+                <p class="text-gray-300 text-sm">Discover your next favorite anime with our curated recommendations.</p>
+            </div>
+            
+            <div class="glass-effect rounded-2xl p-6 anime-card text-center">
+                <div class="w-16 h-16 bg-gradient-to-r from-secondary to-anime-purple rounded-2xl mx-auto flex items-center justify-center mb-4">
+                    <i class="fas fa-palette text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Cultural Celebration</h3>
+                <p class="text-gray-300 text-sm">Dive deep into anime culture, art, music, and the stories behind the stories.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Future Plans Section -->
+<section class="py-16 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="mb-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-accent to-anime-pink rounded-2xl mb-6">
+                <i class="fas fa-magic text-2xl text-white"></i>
+            </div>
+            <h2 class="text-4xl font-bold gradient-text mb-4">The Future is Bright</h2>
+            <p class="text-xl text-gray-300">We're constantly evolving to bring you the best anime experience</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-effect rounded-2xl p-6 anime-card">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                        <i class="fas fa-comments text-white"></i>
+                    </div>
+                    <div class="text-left">
+                        <h3 class="text-lg font-semibold text-white mb-2">Interactive Discussions</h3>
+                        <p class="text-gray-300 text-sm">Advanced commenting system for meaningful conversations about your favorite shows.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-effect rounded-2xl p-6 anime-card">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-anime-blue to-anime-purple rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                        <i class="fas fa-search text-white"></i>
+                    </div>
+                    <div class="text-left">
+                        <h3 class="text-lg font-semibold text-white mb-2">Smart Discovery</h3>
+                        <p class="text-gray-300 text-sm">Powerful search and tagging system to help you find exactly what you're looking for.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-effect rounded-2xl p-6 anime-card">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-anime-pink to-accent rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                        <i class="fas fa-moon text-white"></i>
+                    </div>
+                    <div class="text-left">
+                        <h3 class="text-lg font-semibold text-white mb-2">Night Mode</h3>
+                        <p class="text-gray-300 text-sm">Perfect dark mode experience for those late-night anime marathon sessions.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-effect rounded-2xl p-6 anime-card">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-secondary to-primary rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                        <i class="fas fa-user-circle text-white"></i>
+                    </div>
+                    <div class="text-left">
+                        <h3 class="text-lg font-semibold text-white mb-2">Personal Profiles</h3>
+                        <p class="text-gray-300 text-sm">Custom user accounts to track your anime journey and connect with fellow fans.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-16 px-4 bg-gradient-to-r from-primary/20 to-secondary/20">
+    <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-4xl font-bold text-white mb-6">Ready to Join Our Universe?</h2>
+        <p class="text-xl text-gray-300 mb-8">Become part of the AnimeVerse community and never miss out on amazing anime content again!</p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/" class="bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+                <i class="fas fa-home"></i>
+                Explore Home
+            </a>
+            <a href="/contact/" class="glass-effect hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 border border-white/30">
+                <i class="fas fa-envelope"></i>
+                Get In Touch
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Add scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe all anime-card elements
+    document.querySelectorAll('.anime-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
+    });
+</script>
+{% endblock %}

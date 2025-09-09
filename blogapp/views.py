@@ -74,6 +74,10 @@ def create_post(request):
     }
     return render(request, 'create_post.html', context)
 
+
+def about(request):
+    return render(request, "about.html")
+
 def detail(request, slug):
     post = get_object_or_404(Post, slug=slug, status='published')
     
