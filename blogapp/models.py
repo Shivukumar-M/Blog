@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
@@ -106,10 +107,15 @@ class Post(models.Model):
         super().save(*args, **kwargs)
         
         # Optimize images after saving
-        if self.featured_image:
-            self.optimize_image(self.featured_image.path, max_size=(1200, 600))
-        if self.thumbnail:
-            self.optimize_image(self.thumbnail.path, max_size=(400, 300))
+         # Optimize images after saving (local only)
+        if settings.DEBUG and settings.DEFAULT_FILE_STORAGE != 'cloudinary_storage.storage.MediaCloudinaryStorage':
+            if self.featured_image and os.path.exists(self.featured_image.path):
+                print(f"Optimizing featured image at: {self.featured_image.path}")
+                self.optimize_image(self.featured_image.path, max_size=(1200, 600))
+            
+            if self.thumbnail and os.path.exists(self.thumbnail.path):
+                print(f"Optimizing thumbnail at: {self.thumbnail.path}")
+                self.optimize_image(self.thumbnail.path, max_size=(400, 300))
     
     def optimize_image(self, image_path, max_size):
         """Optimize uploaded images"""
