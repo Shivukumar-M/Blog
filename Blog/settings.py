@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blogapp',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -115,7 +117,10 @@ LOGIN_REDIRECT_URL = '/'
 
 # Media files configuration
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Cloudinary media storage
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Static files configuration  
 STATIC_URL = '/static/'
