@@ -1,28 +1,35 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from django.db.models import Q, Count
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
-from django.contrib.auth import login , logout
+from django.contrib.auth import login, logout
+from mongoengine import NotUniqueError, DoesNotExist
 from .models import Post, Category, Tag, Comment, Newsletter, Contact
-from .forms import CommentForm, NewsletterForm, ContactForm, PostForm,SignUpForm
+from .forms import CommentForm, NewsletterForm, ContactForm, PostForm, SignUpForm
+
 
 def index(request):
     # Get featured posts (high rating or most viewed)
-    featured_posts = Post.objects.filter(
+    featured_posts = Post.objects(
         status='published',
         rating__gte=8.0
     ).order_by('-views')[:3]
     
     # Get recent posts
-    recent_posts = Post.objects.filter(status='published').order_by('-created_at')[:9]
+    recent_posts = Post.objects(status='published').order_by('-created_at')[:9]
     
-    # Get popular categories
-    popular_categories = Category.objects.annotate(
-        post_count=Count('post')
-    ).filter(post_count__gt=0)[:6]
+    # Get popular categories with post counts
+    popular_categories = []
+    for category in Category.objects():
+        post_count = Post.objects(category=category, status='published').count()
+        if post_count > 0:
+            popular_categories.append({
+                'category': category,
+                'post_count': post_count
+            })
+    popular_categories = popular_categories[:6]
     
     context = {
         'featured_posts': featured_posts,
@@ -31,13 +38,15 @@ def index(request):
     }
     return render(request, 'index.html', context)
 
+
 @login_required
 def create_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
-            post.author = request.user
+            post.author_id = request.user.id
+            post.author_username = request.user.username
             
             # Generate slug from title
             post.slug = slugify(post.title)
@@ -45,7 +54,7 @@ def create_post(request):
             # Make slug unique if it already exists
             original_slug = post.slug
             counter = 1
-            while Post.objects.filter(slug=post.slug).exists():
+            while Post.objects(slug=post.slug).first():
                 post.slug = f"{original_slug}-{counter}"
                 counter += 1
             
@@ -56,7 +65,6 @@ def create_post(request):
                 post.status = 'published'
             
             post.save()
-            form.save_m2m()  # Save many-to-many relationships (tags)
             
             if post.status == 'published':
                 messages.success(request, f'Your post "{post.title}" has been published successfully!')
@@ -78,19 +86,25 @@ def create_post(request):
 def about(request):
     return render(request, "about.html")
 
+
 def detail(request, slug):
-    post = get_object_or_404(Post, slug=slug, status='published')
+    try:
+        post = Post.objects(slug=slug, status='published').first()
+        if not post:
+            raise Post.DoesNotExist
+    except Post.DoesNotExist:
+        raise Http404("Post not found")
     
     # Increment view count
     post.increment_views()
     
     # Get related posts
-    related_posts = Post.objects.filter(
+    related_posts = Post.objects(
         status='published',
         category=post.category
-    ).exclude(id=post.id)[:4]
+    ).exclude('id', post.id)[:4] if post.category else []
     
-    comments = post.comments.filter(is_approved=True)
+    comments = post.get_comments()
     
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -111,15 +125,22 @@ def detail(request, slug):
     }
     return render(request, 'detail.html', context)
 
+
 def category_posts(request, slug):
-    category = get_object_or_404(Category, slug=slug)
-    posts = Post.objects.filter(
+    try:
+        category = Category.objects(slug=slug).first()
+        if not category:
+            raise Category.DoesNotExist
+    except Category.DoesNotExist:
+        raise Http404("Category not found")
+    
+    posts = Post.objects(
         status='published',
         category=category
     ).order_by('-created_at')
     
     # Pagination
-    paginator = Paginator(posts, 9)
+    paginator = Paginator(list(posts), 9)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -130,19 +151,39 @@ def category_posts(request, slug):
     }
     return render(request, 'category.html', context)
 
+
 def search(request):
     query = request.GET.get('q', '')
     posts = []
     
     if query:
-        posts = Post.objects.filter(
-            Q(title__icontains=query) |
-            Q(content__icontains=query) |
-            Q(anime_title_jp__icontains=query) |
-            Q(studio__icontains=query) |
-            Q(tags__name__icontains=query),
+        # MongoEngine supports case-insensitive search
+        posts = Post.objects(
             status='published'
-        ).distinct().order_by('-created_at')
+        ).filter(
+            title__icontains=query
+        ) | Post.objects(
+            status='published'
+        ).filter(
+            content__icontains=query
+        ) | Post.objects(
+            status='published'
+        ).filter(
+            anime_title_jp__icontains=query
+        ) | Post.objects(
+            status='published'
+        ).filter(
+            studio__icontains=query
+        )
+        
+        # Remove duplicates and sort
+        unique_ids = set()
+        unique_posts = []
+        for post in posts.order_by('-created_at'):
+            if str(post.id) not in unique_ids:
+                unique_ids.add(str(post.id))
+                unique_posts.append(post)
+        posts = unique_posts
     
     # Pagination
     paginator = Paginator(posts, 9)
@@ -156,20 +197,27 @@ def search(request):
     }
     return render(request, 'search.html', context)
 
+
 def newsletter_signup(request):
     if request.method == 'POST':
         form = NewsletterForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            newsletter, created = Newsletter.objects.get_or_create(email=email)
-            if created:
-                messages.success(request, 'Successfully subscribed to newsletter!')
-            else:
-                messages.info(request, 'You are already subscribed!')
+            try:
+                newsletter = Newsletter.objects(email=email).first()
+                if not newsletter:
+                    newsletter = Newsletter(email=email)
+                    newsletter.save()
+                    messages.success(request, 'Successfully subscribed to newsletter!')
+                else:
+                    messages.info(request, 'You are already subscribed!')
+            except Exception as e:
+                messages.error(request, 'Error processing subscription. Please try again.')
         else:
             messages.error(request, 'Please enter a valid email address.')
     
     return redirect('index')
+
 
 def contact(request):
     if request.method == 'POST':
@@ -184,21 +232,33 @@ def contact(request):
     context = {'form': form}
     return render(request, 'contact.html', context)
 
+
 def archive(request):
-    # Group posts by year and month
-    posts = Post.objects.filter(status='published').order_by('-created_at')
+    # Get all published posts
+    posts = Post.objects(status='published').order_by('-created_at')
     
-    # Get all categories and tags for sidebar
-    categories = Category.objects.annotate(
-        post_count=Count('post')
-    ).filter(post_count__gt=0)
+    # Get all categories and tags with post counts
+    categories = []
+    for category in Category.objects():
+        post_count = Post.objects(category=category, status='published').count()
+        if post_count > 0:
+            categories.append({
+                'category': category,
+                'post_count': post_count
+            })
     
-    tags = Tag.objects.annotate(
-        post_count=Count('post')
-    ).filter(post_count__gt=0)[:20]
+    tags = []
+    for tag in Tag.objects().order_by('name'):
+        post_count = Post.objects(tags=tag, status='published').count()
+        if post_count > 0:
+            tags.append({
+                'tag': tag,
+                'post_count': post_count
+            })
+    tags = tags[:20]
     
     # Pagination
-    paginator = Paginator(posts, 12)
+    paginator = Paginator(list(posts), 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -210,15 +270,22 @@ def archive(request):
     }
     return render(request, 'archive.html', context)
 
+
 def tag_posts(request, slug):
-    tag = get_object_or_404(Tag, slug=slug)
-    posts = Post.objects.filter(
+    try:
+        tag = Tag.objects(slug=slug).first()
+        if not tag:
+            raise Tag.DoesNotExist
+    except Tag.DoesNotExist:
+        raise Http404("Tag not found")
+    
+    posts = Post.objects(
         status='published',
         tags=tag
     ).order_by('-created_at')
     
     # Pagination
-    paginator = Paginator(posts, 9)
+    paginator = Paginator(list(posts), 9)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -230,23 +297,21 @@ def tag_posts(request, slug):
     return render(request, 'tag.html', context)
 
 
-#sign up
+# Sign up
 def signup(req):
     if req.method == 'POST':
         form = SignUpForm(req.POST)
-
         if form.is_valid():
-            user =form.save()
-
+            user = form.save()
             login(req, user)
             return redirect('/')
     else:
         form = SignUpForm()
+    
+    return render(req, 'signup.html', {'form': form})
 
-    return render(req, 'signup.html',{'form':form})
 
-
-# logout
+# Logout
 def logout_view(request):
     logout(request)
     return redirect('/') 

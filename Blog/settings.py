@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from decouple import config
-import dj_database_url
+import mongoengine
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,19 +15,20 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
 
-# Database configuration
-DATABASE_URL = config('DATABASE_URL', default=None)
-if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+# MongoDB configuration
+MONGODB_URI = config('MONGODB_URI', default='mongodb://localhost:27017/blog_db')
+MONGODB_DB_NAME = config('MONGODB_DB_NAME', default='blog_db')
+
+# Connect to MongoDB using MongoEngine
+mongoengine.connect(MONGODB_DB_NAME, host=MONGODB_URI)
+
+# Django still needs a database backend for sessions, admin, and auth
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 
 

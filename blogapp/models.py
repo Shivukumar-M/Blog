@@ -1,34 +1,27 @@
-from django.db import models
-from django.conf import settings
+from mongoengine import Document, EmbeddedDocument, StringField, TextField, IntField, FloatField, \
+    DateTimeField, BooleanField, ImageField, ListField, ReferenceField, EmbeddedDocumentField, \
+    SequenceField, URLField, EmailField, ValidationError
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
 from PIL import Image
+from django.conf import settings
 import os
+from datetime import datetime
 
-# Create your models here.
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
-    description = models.TextField(blank=True)
-    color = models.CharField(max_length=7, default='#6366f1')  # Hex color for category
-    
-    class Meta:
-        verbose_name_plural = "Categories"
-        ordering = ['name']
-        
-    def __str__(self):
-        return self.name
-    
-    def get_absolute_url(self):
-        return reverse('category_posts', kwargs={'slug': self.slug})
 
-class Tag(models.Model):
-    name = models.CharField(max_length=50)
-    slug = models.SlugField(unique=True)
+class Category(Document):
+    name = StringField(max_length=100, required=True, unique=True)
+    slug = StringField(unique=True, required=True)
+    description = TextField()
+    color = StringField(max_length=7, default='#6366f1')  # Hex color for category
+    created_at = DateTimeField(default=datetime.utcnow)
     
-    class Meta:
-        ordering = ['name']
+    meta = {
+        'collection': 'categories',
+        'indexes': ['slug', 'name'],
+        'ordering': ['name']
+    }
     
     def __str__(self):
         return self.name
@@ -36,12 +29,44 @@ class Tag(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
+    
+    def get_absolute_url(self):
+        return reverse('category_posts', kwargs={'slug': self.slug})
+    
+    def get_post_count(self):
+        """Get number of published posts in this category"""
+        return Post.objects(category=self, status='published').count()
+
+
+class Tag(Document):
+    name = StringField(max_length=50, required=True, unique=True)
+    slug = StringField(unique=True, required=True)
+    created_at = DateTimeField(default=datetime.utcnow)
+    
+    meta = {
+        'collection': 'tags',
+        'indexes': ['slug', 'name'],
+        'ordering': ['name']
+    }
+    
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
     
     def get_absolute_url(self):
         return reverse('tag_posts', kwargs={'slug': self.slug})
+    
+    def get_post_count(self):
+        """Get number of published posts with this tag"""
+        return Post.objects(tags=self, status='published').count()
 
-class Post(models.Model):
+
+class Post(Document):
     STATUS_CHOICES = [
         ('draft', 'Draft'),
         ('published', 'Published'),
@@ -55,40 +80,44 @@ class Post(models.Model):
         ('ona', 'ONA'),
     ]
     
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
-    content = models.TextField()
-    excerpt = models.TextField(max_length=300, help_text="Brief description for preview")
+    title = StringField(max_length=255, required=True)
+    slug = StringField(unique=True, required=True)
+    content = TextField(required=True)
+    excerpt = TextField(max_length=300)
     
     # Anime-specific fields
-    anime_title_jp = models.CharField(max_length=255, blank=True, help_text="Japanese title", verbose_name="Japanese Title")
-    anime_type = models.CharField(max_length=10, choices=ANIME_TYPES, blank=True, verbose_name="Anime Type")
-    rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True, help_text="Rating out of 10")
-    episode_count = models.IntegerField(null=True, blank=True, verbose_name="Episode Count")
-    release_year = models.IntegerField(null=True, blank=True, verbose_name="Release Year")
-    studio = models.CharField(max_length=100, blank=True)
+    anime_title_jp = StringField(max_length=255)
+    anime_type = StringField(max_length=10, choices=ANIME_TYPES)
+    rating = FloatField(min_value=0, max_value=10)
+    episode_count = IntField()
+    release_year = IntField()
+    studio = StringField(max_length=100)
     
-    # Images
-    featured_image = models.ImageField(upload_to='blog_images/', blank=True, null=True, verbose_name="Featured Image")
-    thumbnail = models.ImageField(upload_to='thumbnails/', blank=True, null=True)
+    # Images (URLs/paths for Cloudinary)
+    featured_image = StringField()
+    thumbnail = StringField()
     
     # Metadata
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
-    tags = models.ManyToManyField(Tag, blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='published')
+    author_id = IntField(required=True)  # Django User ID
+    author_username = StringField(required=True)  # Store username for reference
+    category = ReferenceField(Category, null=True)
+    tags = ListField(ReferenceField(Tag))
+    status = StringField(max_length=10, choices=STATUS_CHOICES, default='published')
     
     # SEO fields
-    meta_description = models.CharField(max_length=160, blank=True, verbose_name="Meta Description")
-    meta_keywords = models.CharField(max_length=255, blank=True, verbose_name="Meta Keywords")
+    meta_description = StringField(max_length=160)
+    meta_keywords = StringField(max_length=255)
     
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    views = models.PositiveIntegerField(default=0)
+    created_at = DateTimeField(default=datetime.utcnow)
+    updated_at = DateTimeField(default=datetime.utcnow)
+    views = IntField(default=0)
     
-    class Meta:
-        ordering = ["-created_at"]
-        
+    meta = {
+        'collection': 'posts',
+        'indexes': ['slug', 'status', 'author_id', 'created_at', '-created_at'],
+        'ordering': ['-created_at']
+    }
+    
     def __str__(self):
         return self.title
     
@@ -100,44 +129,18 @@ class Post(models.Model):
             # Ensure slug is unique
             original_slug = self.slug
             counter = 1
-            while Post.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+            while Post.objects(slug=self.slug).exclude('id', self.id if hasattr(self, 'id') else None).first():
                 self.slug = f"{original_slug}-{counter}"
                 counter += 1
         
-        super().save(*args, **kwargs)
-        
-        # Optimize images after saving
-         # Optimize images after saving (local only)
-        if settings.DEBUG and settings.DEFAULT_FILE_STORAGE != 'cloudinary_storage.storage.MediaCloudinaryStorage':
-            if self.featured_image and os.path.exists(self.featured_image.path):
-                print(f"Optimizing featured image at: {self.featured_image.path}")
-                self.optimize_image(self.featured_image.path, max_size=(1200, 600))
-            
-            if self.thumbnail and os.path.exists(self.thumbnail.path):
-                print(f"Optimizing thumbnail at: {self.thumbnail.path}")
-                self.optimize_image(self.thumbnail.path, max_size=(400, 300))
-    
-    def optimize_image(self, image_path, max_size):
-        """Optimize uploaded images"""
-        try:
-            if os.path.exists(image_path):
-                with Image.open(image_path) as img:
-                    # Convert to RGB if necessary
-                    if img.mode in ('RGBA', 'LA', 'P'):
-                        img = img.convert('RGB')
-                    
-                    # Resize if larger than max_size
-                    img.thumbnail(max_size, Image.Resampling.LANCZOS)
-                    
-                    # Save optimized image
-                    img.save(image_path, optimize=True, quality=85)
-        except Exception as e:
-            print(f"Error optimizing image {image_path}: {e}")
+        self.updated_at = datetime.utcnow()
+        return super().save(*args, **kwargs)
     
     def get_absolute_url(self):
         return reverse('detail', kwargs={'slug': self.slug})
     
     def increment_views(self):
+        """Increment view count"""
         self.views += 1
         self.save(update_fields=['views'])
     
@@ -151,42 +154,58 @@ class Post(models.Model):
         """Calculate estimated reading time"""
         word_count = len(self.content.split())
         return max(1, word_count // 200)  # Assuming 200 words per minute
-
-class Comment(models.Model):
-    post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    email = models.EmailField()
-    content = models.TextField()
-    is_approved = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
     
-    class Meta:
-        ordering = ["-created_at"]
-        
+    def get_comments(self):
+        """Get approved comments for this post"""
+        return Comment.objects(post=self, is_approved=True).order_by('-created_at')
+
+
+class Comment(Document):
+    post = ReferenceField(Post, required=True)
+    name = StringField(max_length=255, required=True)
+    email = EmailField(required=True)
+    content = TextField(required=True)
+    is_approved = BooleanField(default=True)
+    created_at = DateTimeField(default=datetime.utcnow)
+    
+    meta = {
+        'collection': 'comments',
+        'indexes': ['post', 'created_at', '-created_at'],
+        'ordering': ['-created_at']
+    }
+    
     def __str__(self):
         return f'{self.name} - {self.post.title[:50]}'
 
-class Newsletter(models.Model):
-    email = models.EmailField(unique=True)
-    subscribed_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+
+class Newsletter(Document):
+    email = EmailField(required=True, unique=True)
+    subscribed_at = DateTimeField(default=datetime.utcnow)
+    is_active = BooleanField(default=True)
     
-    class Meta:
-        ordering = ['-subscribed_at']
-        
+    meta = {
+        'collection': 'newsletter_subscribers',
+        'indexes': ['email', '-subscribed_at'],
+        'ordering': ['-subscribed_at']
+    }
+    
     def __str__(self):
         return self.email
 
-class Contact(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
-    subject = models.CharField(max_length=200)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
+
+class Contact(Document):
+    name = StringField(max_length=100, required=True)
+    email = EmailField(required=True)
+    subject = StringField(max_length=200, required=True)
+    message = TextField(required=True)
+    created_at = DateTimeField(default=datetime.utcnow)
+    is_read = BooleanField(default=False)
     
-    class Meta:
-        ordering = ['-created_at']
-        
+    meta = {
+        'collection': 'contact_messages',
+        'indexes': ['email', 'created_at', '-created_at'],
+        'ordering': ['-created_at']
+    }
+    
     def __str__(self):
         return f'{self.name} - {self.subject[:30]}'
