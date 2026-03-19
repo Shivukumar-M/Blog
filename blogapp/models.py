@@ -1,19 +1,14 @@
-from mongoengine import Document, EmbeddedDocument, StringField, TextField, IntField, FloatField, \
-    DateTimeField, BooleanField, ImageField, ListField, ReferenceField, EmbeddedDocumentField, \
-    SequenceField, URLField, EmailField, ValidationError
-from django.contrib.auth.models import User
+from mongoengine import Document, StringField, IntField, FloatField, \
+    DateTimeField, BooleanField, ListField, ReferenceField, EmailField
 from django.urls import reverse
 from django.utils.text import slugify
-from PIL import Image
-from django.conf import settings
-import os
 from datetime import datetime
 
 
 class Category(Document):
     name = StringField(max_length=100, required=True, unique=True)
     slug = StringField(unique=True, required=True)
-    description = TextField()
+    description = StringField()
     color = StringField(max_length=7, default='#6366f1')  # Hex color for category
     created_at = DateTimeField(default=datetime.utcnow)
     
@@ -82,8 +77,8 @@ class Post(Document):
     
     title = StringField(max_length=255, required=True)
     slug = StringField(unique=True, required=True)
-    content = TextField(required=True)
-    excerpt = TextField(max_length=300)
+    content = StringField(required=True)
+    excerpt = StringField(max_length=300)
     
     # Anime-specific fields
     anime_title_jp = StringField(max_length=255)
@@ -129,7 +124,7 @@ class Post(Document):
             # Ensure slug is unique
             original_slug = self.slug
             counter = 1
-            while Post.objects(slug=self.slug).exclude('id', self.id if hasattr(self, 'id') else None).first():
+            while Post.objects(slug=self.slug, id__ne=self.id).first():
                 self.slug = f"{original_slug}-{counter}"
                 counter += 1
         
@@ -142,7 +137,7 @@ class Post(Document):
     def increment_views(self):
         """Increment view count"""
         self.views += 1
-        self.save(update_fields=['views'])
+        self.save()
     
     @property
     def is_featured(self):
@@ -164,7 +159,7 @@ class Comment(Document):
     post = ReferenceField(Post, required=True)
     name = StringField(max_length=255, required=True)
     email = EmailField(required=True)
-    content = TextField(required=True)
+    content = StringField(required=True)
     is_approved = BooleanField(default=True)
     created_at = DateTimeField(default=datetime.utcnow)
     
@@ -197,7 +192,7 @@ class Contact(Document):
     name = StringField(max_length=100, required=True)
     email = EmailField(required=True)
     subject = StringField(max_length=200, required=True)
-    message = TextField(required=True)
+    message = StringField(required=True)
     created_at = DateTimeField(default=datetime.utcnow)
     is_read = BooleanField(default=False)
     

@@ -1,11 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.contrib import messages
-from django.http import JsonResponse, Http404
+from django.http import Http404
 from django.contrib.auth.decorators import login_required
-from django.utils.text import slugify
 from django.contrib.auth import login, logout
-from mongoengine import NotUniqueError, DoesNotExist
 from .models import Post, Category, Tag, Comment, Newsletter, Contact
 from .forms import CommentForm, NewsletterForm, ContactForm, PostForm, SignUpForm
 
@@ -25,10 +23,8 @@ def index(request):
     for category in Category.objects():
         post_count = Post.objects(category=category, status='published').count()
         if post_count > 0:
-            popular_categories.append({
-                'category': category,
-                'post_count': post_count
-            })
+            category.post_count = post_count
+            popular_categories.append(category)
     popular_categories = popular_categories[:6]
     
     context = {
@@ -44,29 +40,15 @@ def create_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author_id = request.user.id
-            post.author_username = request.user.username
-            
-            # Generate slug from title
-            post.slug = slugify(post.title)
-            
-            # Make slug unique if it already exists
-            original_slug = post.slug
-            counter = 1
-            while Post.objects(slug=post.slug).first():
-                post.slug = f"{original_slug}-{counter}"
-                counter += 1
-            
             # Handle status from form submission
             if 'status' in request.POST:
-                post.status = request.POST['status']
+                post_status = request.POST['status']
             else:
-                post.status = 'published'
+                post_status = 'published'
+
+            post = form.save(author=request.user, status=post_status)
             
-            post.save()
-            
-            if post.status == 'published':
+            if post_status == 'published':
                 messages.success(request, f'Your post "{post.title}" has been published successfully!')
                 return redirect('detail', slug=post.slug)
             else:
@@ -102,16 +84,14 @@ def detail(request, slug):
     related_posts = Post.objects(
         status='published',
         category=post.category
-    ).exclude('id', post.id)[:4] if post.category else []
+    ).filter(id__ne=post.id)[:4] if post.category else []
     
     comments = post.get_comments()
     
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.save()
+            form.save(post=post)
             messages.success(request, 'Your comment has been submitted!')
             return redirect('detail', slug=slug)
     else:
@@ -202,16 +182,13 @@ def newsletter_signup(request):
     if request.method == 'POST':
         form = NewsletterForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email']
             try:
-                newsletter = Newsletter.objects(email=email).first()
-                if not newsletter:
-                    newsletter = Newsletter(email=email)
-                    newsletter.save()
+                _, created = form.save()
+                if created:
                     messages.success(request, 'Successfully subscribed to newsletter!')
                 else:
                     messages.info(request, 'You are already subscribed!')
-            except Exception as e:
+            except Exception:
                 messages.error(request, 'Error processing subscription. Please try again.')
         else:
             messages.error(request, 'Please enter a valid email address.')
@@ -242,19 +219,15 @@ def archive(request):
     for category in Category.objects():
         post_count = Post.objects(category=category, status='published').count()
         if post_count > 0:
-            categories.append({
-                'category': category,
-                'post_count': post_count
-            })
+            category.post_count = post_count
+            categories.append(category)
     
     tags = []
     for tag in Tag.objects().order_by('name'):
         post_count = Post.objects(tags=tag, status='published').count()
         if post_count > 0:
-            tags.append({
-                'tag': tag,
-                'post_count': post_count
-            })
+            tag.post_count = post_count
+            tags.append(tag)
     tags = tags[:20]
     
     # Pagination

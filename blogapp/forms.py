@@ -1,5 +1,6 @@
 from django import forms
 from .models import Comment, Newsletter, Contact, Post, Category, Tag
+import cloudinary.uploader
 
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -12,9 +13,31 @@ class SignUpForm(UserCreationForm):
 
 
 
-class PostForm(forms.ModelForm):
+class PostForm(forms.Form):
+    title = forms.CharField(max_length=255)
+    excerpt = forms.CharField(max_length=300, widget=forms.Textarea)
+    content = forms.CharField(widget=forms.Textarea)
+    anime_title_jp = forms.CharField(max_length=255, required=False)
+    anime_type = forms.ChoiceField(choices=Post.ANIME_TYPES, required=False)
+    rating = forms.DecimalField(max_digits=3, decimal_places=1, required=False)
+    episode_count = forms.IntegerField(required=False)
+    release_year = forms.IntegerField(required=False)
+    studio = forms.CharField(max_length=100, required=False)
+    category = forms.ChoiceField(required=False)
+    tags = forms.MultipleChoiceField(required=False)
+    featured_image = forms.ImageField(required=False)
+    thumbnail = forms.ImageField(required=False)
+    meta_description = forms.CharField(max_length=160, required=False)
+    meta_keywords = forms.CharField(max_length=255, required=False)
+
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
+        self.fields['category'].choices = [('', '---------')] + [
+            (str(category.id), category.name) for category in Category.objects().order_by('name')
+        ]
+        self.fields['tags'].choices = [
+            (str(tag.id), tag.name) for tag in Tag.objects().order_by('name')
+        ]
         
         # Common styling for text inputs
         text_input_classes = ' w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white placeholder-gray-400'
@@ -108,14 +131,6 @@ class PostForm(forms.ModelForm):
             'placeholder': 'anime, review, action, shounen'
         })
 
-    class Meta:
-        model = Post
-        fields = [
-            'title', 'excerpt', 'content', 'anime_title_jp', 'anime_type', 
-            'rating', 'episode_count', 'release_year', 'studio', 'category', 
-            'tags', 'featured_image', 'thumbnail', 'meta_description', 'meta_keywords'
-        ]
-        
     def clean_title(self):
         title = self.cleaned_data['title']
         if len(title) < 5:
@@ -140,7 +155,58 @@ class PostForm(forms.ModelForm):
             raise forms.ValidationError("Please enter a valid release year.")
         return release_year
 
-class CommentForm(forms.ModelForm):
+    def save(self, author, status='published'):
+        data = self.cleaned_data
+        category = None
+        category_id = data.get('category')
+        if category_id:
+            category = Category.objects(id=category_id).first()
+
+        tag_ids = data.get('tags', [])
+        tags = list(Tag.objects(id__in=tag_ids)) if tag_ids else []
+
+        post = Post(
+            title=data['title'],
+            excerpt=data['excerpt'],
+            content=data['content'],
+            anime_title_jp=data.get('anime_title_jp', ''),
+            anime_type=data.get('anime_type') or '',
+            rating=float(data['rating']) if data.get('rating') is not None else None,
+            episode_count=data.get('episode_count'),
+            release_year=data.get('release_year'),
+            studio=data.get('studio', ''),
+            category=category,
+            tags=tags,
+            meta_description=data.get('meta_description', ''),
+            meta_keywords=data.get('meta_keywords', ''),
+            author_id=author.id,
+            author_username=author.username,
+            status=status,
+        )
+
+        featured_image = self.files.get('featured_image')
+        thumbnail = self.files.get('thumbnail')
+        if featured_image:
+            try:
+                upload_result = cloudinary.uploader.upload(featured_image, folder='blog_images')
+                post.featured_image = upload_result.get('secure_url', featured_image.name)
+            except Exception:
+                post.featured_image = featured_image.name
+        if thumbnail:
+            try:
+                upload_result = cloudinary.uploader.upload(thumbnail, folder='thumbnails')
+                post.thumbnail = upload_result.get('secure_url', thumbnail.name)
+            except Exception:
+                post.thumbnail = thumbnail.name
+
+        post.save()
+        return post
+
+class CommentForm(forms.Form):
+    name = forms.CharField(max_length=255)
+    email = forms.EmailField()
+    content = forms.CharField(widget=forms.Textarea)
+
     def __init__(self, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
         self.fields['name'].widget.attrs.update({
@@ -157,17 +223,25 @@ class CommentForm(forms.ModelForm):
             'rows': 4
         })
 
-    class Meta:
-        model = Comment
-        fields = ('name', 'email', 'content')
-        
     def clean_content(self):
         content = self.cleaned_data['content']
         if len(content) < 5:
             raise forms.ValidationError("Comment must be at least 5 characters long.")
         return content
 
-class NewsletterForm(forms.ModelForm):
+    def save(self, post):
+        comment = Comment(
+            post=post,
+            name=self.cleaned_data['name'],
+            email=self.cleaned_data['email'],
+            content=self.cleaned_data['content'],
+        )
+        comment.save()
+        return comment
+
+class NewsletterForm(forms.Form):
+    email = forms.EmailField()
+
     def __init__(self, *args, **kwargs):
         super(NewsletterForm, self).__init__(*args, **kwargs)
         self.fields['email'].widget.attrs.update({
@@ -175,11 +249,22 @@ class NewsletterForm(forms.ModelForm):
             'placeholder': 'Enter your email for anime updates...'
         })
 
-    class Meta:
-        model = Newsletter
-        fields = ('email',)
+    def save(self):
+        email = self.cleaned_data['email']
+        newsletter = Newsletter.objects(email=email).first()
+        created = False
+        if not newsletter:
+            newsletter = Newsletter(email=email)
+            newsletter.save()
+            created = True
+        return newsletter, created
 
-class ContactForm(forms.ModelForm):
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    subject = forms.CharField(max_length=200)
+    message = forms.CharField(widget=forms.Textarea)
+
     def __init__(self, *args, **kwargs):
         super(ContactForm, self).__init__(*args, **kwargs)
         
@@ -204,15 +289,21 @@ class ContactForm(forms.ModelForm):
             'rows': 6
         })
 
-    class Meta:
-        model = Contact
-        fields = ('name', 'email', 'subject', 'message')
-        
     def clean_message(self):
         message = self.cleaned_data['message']
         if len(message) < 10:
             raise forms.ValidationError("Message must be at least 10 characters long.")
         return message
+
+    def save(self):
+        contact = Contact(
+            name=self.cleaned_data['name'],
+            email=self.cleaned_data['email'],
+            subject=self.cleaned_data['subject'],
+            message=self.cleaned_data['message'],
+        )
+        contact.save()
+        return contact
 
 class SearchForm(forms.Form):
     q = forms.CharField(
