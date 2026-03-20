@@ -77,16 +77,27 @@ def detail(request, slug):
     except Post.DoesNotExist:
         raise Http404("Post not found")
     
-    # Increment view count
-    post.increment_views()
+    # Increment view count, but do not fail page rendering if persistence errors occur.
+    try:
+        post.increment_views()
+    except Exception:
+        pass
     
-    # Get related posts
-    related_posts = Post.objects(
-        status='published',
-        category=post.category
-    ).filter(id__ne=post.id)[:4] if post.category else []
+    # Fetch related posts safely; broken/removed category references should not crash page.
+    related_posts = []
+    try:
+        if post.category:
+            related_posts = Post.objects(
+                status='published',
+                category=post.category
+            ).filter(id__ne=post.id)[:4]
+    except Exception:
+        related_posts = []
     
-    comments = post.get_comments()
+    try:
+        comments = post.get_comments()
+    except Exception:
+        comments = []
     
     if request.method == 'POST':
         form = CommentForm(request.POST)

@@ -1,0 +1,42 @@
+/* Custom styling for select elements used in themed forms */
+select.themed-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: linear-gradient(135deg, #8b5cf6, #c084fc) !important;
+    background-image: linear-gradient(135deg, #8b5cf6, #c084fc), url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-position: 0 0, right 0.75rem center !important;
+    background-size: 100% 100%, 1.5em 1.5em !important;
+    padding-right: 2.5rem;
+    color: white !important;
+}
+
+select.themed-select:hover {
+    background: linear-gradient(135deg, #7c3aed, #a855f7) !important;
+    background-image: linear-gradient(135deg, #7c3aed, #a855f7), url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-position: 0 0, right 0.75rem center !important;
+    background-size: 100% 100%, 1.5em 1.5em !important;
+}
+
+select.themed-select:focus {
+    outline: none;
+    background: linear-gradient(135deg, #8b5cf6, #c084fc) !important;
+    background-image: linear-gradient(135deg, #8b5cf6, #c084fc), url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-position: 0 0, right 0.75rem center !important;
+    background-size: 100% 100%, 1.5em 1.5em !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+select.themed-select option {
+    background-color: white;
+    color: black;
+    padding: 0.5rem;
+}
+
+select.themed-select option:hover {
+    background-color: rgb(168, 85, 247);
+    color: white;
+}

@@ -1,6 +1,7 @@
 from django import forms
 from .models import Comment, Newsletter, Contact, Post, Category, Tag
 import cloudinary.uploader
+from django.core.files.storage import FileSystemStorage
 
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -43,7 +44,7 @@ class PostForm(forms.Form):
         text_input_classes = ' w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white placeholder-gray-400'
         
         # Common styling for select inputs
-        select_classes = 'text-black w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white'
+        select_classes = 'themed-select w-full py-3 px-4 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white'
         
         # Common styling for textarea
         textarea_classes = ' w-full py-3 px-4 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary/50 transition-all duration-300 text-white placeholder-gray-400 resize-vertical'
@@ -191,13 +192,17 @@ class PostForm(forms.Form):
                 upload_result = cloudinary.uploader.upload(featured_image, folder='blog_images')
                 post.featured_image = upload_result.get('secure_url', featured_image.name)
             except Exception:
-                post.featured_image = featured_image.name
+                fs = FileSystemStorage()
+                filename = fs.save(f'uploads/{featured_image.name}', featured_image)
+                post.featured_image = fs.url(filename)
         if thumbnail:
             try:
                 upload_result = cloudinary.uploader.upload(thumbnail, folder='thumbnails')
                 post.thumbnail = upload_result.get('secure_url', thumbnail.name)
             except Exception:
-                post.thumbnail = thumbnail.name
+                fs = FileSystemStorage()
+                filename = fs.save(f'uploads/{thumbnail.name}', thumbnail)
+                post.thumbnail = fs.url(filename)
 
         post.save()
         return post

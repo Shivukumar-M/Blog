@@ -1,0 +1,55 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">Home</a> &rsaquo;
+<a href="{% url 'admin:blogapp_dashboard' %}">Content Manager</a> &rsaquo; Categories
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Manage Categories</h1>
+
+    <div class="module aligned">
+        <h2>Create Category</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Save category" class="default">
+            <a href="{% url 'admin:blogapp_seed_categories' %}" class="button">Create Blog / News / Review</a>
+        </form>
+    </div>
+
+    <div class="module">
+        <h2>Existing Categories</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Color</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ category.name }}</td>
+                    <td>{{ category.slug }}</td>
+                    <td>{{ category.color|default:"-" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'admin:blogapp_delete_category' category.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="submit" value="Delete" onclick="return confirm('Delete this category?');">
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No categories available.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

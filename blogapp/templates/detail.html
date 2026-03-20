@@ -22,7 +22,7 @@
         <!-- Featured Image -->
         {% if post.featured_image %}
         <div class="relative h-96 rounded-2xl overflow-hidden mb-8 group">
-            <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" 
+            <img src="{% if 'http' in post.featured_image or post.featured_image|first == '/' %}{{ post.featured_image }}{% else %}/media/{{ post.featured_image }}{% endif %}" alt="{{ post.title }}" 
                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
             
@@ -65,7 +65,7 @@
                 </div>
                 <div class="flex items-center">
                     <i class="fas fa-user mr-2 text-secondary"></i>
-                    {{ post.author.get_full_name|default:post.author.username }}
+                    {{ post.author_username|default:'Unknown author' }}
                 </div>
                 <div class="flex items-center">
                     <i class="fas fa-eye mr-2 text-anime-pink"></i>
@@ -109,8 +109,8 @@
     </header>
     
     <!-- Post Content -->
-    <div class="prose prose-lg prose-invert max-w-none mb-12">
-        <div class="text-gray-300 leading-relaxed text-lg">
+    <div class="prose prose-lg prose-invert max-w-none mb-12 overflow-hidden">
+        <div class="text-gray-300 leading-relaxed text-lg break-words [overflow-wrap:anywhere]">
             {{ post.content|linebreaks }}
         </div>
     </div>
@@ -173,7 +173,7 @@
             <article class="anime-card rounded-xl overflow-hidden group">
                 {% if related.thumbnail %}
                 <div class="relative h-32 overflow-hidden">
-                    <img src="{{ related.thumbnail.url }}" alt="{{ related.title }}" 
+                    <img src="{% if 'http' in related.thumbnail or related.thumbnail|first == '/' %}{{ related.thumbnail }}{% else %}/media/{{ related.thumbnail }}{% endif %}" alt="{{ related.title }}" 
                          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                     {% if related.rating %}
@@ -208,18 +208,18 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <div>
                     <span class="text-white">
-                    {{ form.name.label_tag }} <span>
+                    {{ form.name.label_tag }}</span>
                     {{ form.name }}
                 </div>
                 <div>
                     <span class="text-white">
-                    {{ form.email.label_tag }} <span>
+                    {{ form.email.label_tag }}</span>
                     {{ form.email }}
                 </div>
             </div>
             <div>
                 <span class="text-white">
-                {{ form.content.label_tag }} <span>
+                {{ form.content.label_tag }}</span>
                 {{ form.content }}
             </div>
             <button type="submit" 

@@ -1,0 +1,36 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+{{ block.super }}
+
+<div style="margin-top: 30px;">
+
+    <h2 style="margin-bottom: 15px;">🚀 Blog Management</h2>
+
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+
+        <a href="{% url 'admin:blogapp_dashboard' %}" 
+           style="padding: 12px 20px; background:#2563eb; color:white; text-decoration:none; border-radius:8px;">
+            📊 Dashboard
+        </a>
+
+        <a href="{% url 'admin:blogapp_post_manager' %}" 
+           style="padding: 12px 20px; background:#16a34a; color:white; text-decoration:none; border-radius:8px;">
+            📝 Manage Posts
+        </a>
+
+        <a href="{% url 'admin:blogapp_category_manager' %}" 
+           style="padding: 12px 20px; background:#9333ea; color:white; text-decoration:none; border-radius:8px;">
+            📂 Manage Categories
+        </a>
+
+        <a href="{% url 'admin:blogapp_seed_categories' %}" 
+           style="padding: 12px 20px; background:#f59e0b; color:black; text-decoration:none; border-radius:8px;">
+            ⚡ Seed Categories
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
